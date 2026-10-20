@@ -1,65 +1,64 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
+import { COLORS, SPACE, RADIUS, TYPO } from '../styles/tokens';
 
-export default function DiaryCard({ title, date, preview, moodUri, mood }) {
-  // Fungsi untuk memberikan variasi warna border berdasarkan mood
-  const getBorderColor = () => {
-    switch (mood) {
-      case 'happy': return '#10b981';   // Hijau
-      case 'focus': return '#3b82f6';   // Biru
-      case 'calm': return '#8b5cf6';    // Ungu
-      case 'excited': return '#f59e0b'; // Oranye
-      default: return '#e5e7eb';        // Abu-abu default
-    }
-  };
-
+export default function DiaryCard({
+  title,
+  date,
+  preview,
+  moodImage,
+  liked = false,
+  onPress = () => {},
+  onToggleLike = () => {},
+}) {
   return (
-    <View style={[styles.card, { borderColor: getBorderColor() }]}>
-      <Image 
-        source={typeof moodUri === 'string' ? { uri: moodUri } : moodUri} 
-        style={styles.mood} 
-      />
-      <View style={styles.cardContent}>
-        <Text style={styles.title} numberOfLines={1}>
-          {title}
-        </Text>
-        <Text style={styles.date}>{date}</Text>
-        <Text style={styles.preview} numberOfLines={3} ellipsizeMode="tail">
-          {preview}
-        </Text>
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [{ opacity: pressed ? 0.85 : 1 }]}
+      accessible
+      accessibilityLabel={`Entri ${title} tanggal ${date}`}
+    >
+      <View style={styles.card}>
+        <Image source={moodImage} style={styles.mood} />
+        <View style={styles.content}>
+          <Text style={styles.title} numberOfLines={1}>{title}</Text>
+          <Text style={styles.date}>{date}</Text>
+          <Text style={styles.preview} numberOfLines={3} ellipsizeMode="tail">
+            {preview}
+          </Text>
+        </View>
+        <Pressable
+          onPress={onToggleLike}
+          hitSlop={8}
+          accessibilityLabel={liked ? 'Batal suka' : 'Suka'}
+        >
+          <Text style={styles.like}>{liked ? '❤️' : '🤍'}</Text>
+        </Pressable>
       </View>
-    </View>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
-    gap: 12,
-    padding: 12,
-    borderWidth: 2, // Dibuat sedikit lebih tebal agar variasi warnanya terlihat jelas
-    borderRadius: 12,
-    marginBottom: 12,
-    backgroundColor: '#ffffff',
+    gap: SPACE.m,
+    padding: SPACE.m,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: RADIUS.card,
+    backgroundColor: COLORS.surface,
+    alignItems: 'center',
   },
   mood: {
     width: 64,
     height: 64,
-    borderRadius: 32,
+    borderRadius: RADIUS.avatar,
+    backgroundColor: '#eef2ff',
   },
-  cardContent: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  date: {
-    fontSize: 12,
-    color: '#6b7280',
-    marginBottom: 6,
-  },
-  preview: {
-    fontSize: 14,
-  },
+  content: { flex: 1 },
+  title: { fontSize: TYPO.title, fontWeight: '700', color: COLORS.text },
+  date: { fontSize: TYPO.caption, color: COLORS.muted, marginBottom: 6 },
+  preview: { fontSize: TYPO.body, color: COLORS.text },
+  like: { fontSize: 22, paddingHorizontal: 6 },
 });
